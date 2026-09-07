@@ -22,16 +22,17 @@ if user_question := st.chat_input("Ask me anything, Dad!"):
 
     with st.chat_message("assistant"):
         try:
-            # Connect directly to a completely open public AI pipeline that requires no keys!
-            url = f"https://pollinations.ai{requests.utils.quote(user_question)}?json=true"
+            # We pass the prompt clean as a simple web payload to avoid formatting crashes!
+            url = f"https://pollinations.ai{requests.utils.quote(user_question)}"
             response = requests.get(url, timeout=15)
             
             if response.status_code == 200:
-                data = response.json()
-                # Safely extract the raw AI response text block
-                answer = data.get("response", data.get("text", "Hello! I am ready to help."))
+                answer = response.text
+                # If a messy website layout leaks through, clean it out
+                if "<!DOCTYPE" in answer or "<html" in answer:
+                    answer = "Hi Dad! I connected to the server, but it sent back a messy website layout. Try typing your message one more time!"
             else:
-                answer = "The server is a bit busy right now. Please type your message one more time!"
+                answer = f"The server is a bit busy (Code {response.status_code}). Please type your message again!"
         except Exception as e:
             answer = "Connection failed to process. Let's try sending the message again!"
             
