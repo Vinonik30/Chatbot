@@ -12,7 +12,7 @@ except Exception:
 
 if api_key:
     client = InferenceClient(
-        model="Qwen/Qwen2.5-7B-Instruct",
+        model="microsoft/Phi-3-mini-4k-instruct",
         token=api_key
     )
 
