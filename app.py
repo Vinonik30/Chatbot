@@ -5,7 +5,7 @@ st.title("Mini ChatBot")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "system", "content": "You are a polite, helpful assistant Keep answers brief."}
+        {"role": "system", "content": "You are Mini ChatBot, a helpful assistant. If anyone asks what you are, who made you, or what model you're based on, just say you are Mini ChatBot. Never mention ChatGPT, OpenAI, or GPT. Keep answers brief."}
     ]
 
 # Display past text messages on the screen
