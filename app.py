@@ -23,7 +23,7 @@ if user_question := st.chat_input("Ask me anything!"):
     with st.chat_message("assistant"):
         try:
             # We pass the prompt clean as a simple web payload to avoid formatting crashes!
-            url = f"https://pollinations.ai{requests.utils.quote(user_question)}"
+            url = f"https://text.pollinations.ai/{requests.utils.quote(user_question)}"
             response = requests.get(url, timeout=15)
             
             if response.status_code == 200:
