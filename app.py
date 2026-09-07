@@ -1,7 +1,7 @@
 import streamlit as st
 from huggingface_hub import InferenceClient
 
-st.title("🤖 Dad's Personal Assistant")
+st.title("Mini ChatBot")
 
 # --- FETCH HIDDEN KEY FROM STREAMLIT VAULT ---
 try:
@@ -18,7 +18,7 @@ if api_key:
 
     if "messages" not in st.session_state:
         st.session_state.messages = [
-            {"role": "system", "content": "You are a polite, helpful assistant built for my dad. Keep answers brief."}
+            {"role": "system", "content": "You are a polite, helpful assistant Keep answers brief."}
         ]
 
     for message in st.session_state.messages:
