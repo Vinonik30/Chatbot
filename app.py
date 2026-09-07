@@ -12,7 +12,7 @@ except Exception:
 
 if api_key:
     client = InferenceClient(
-        "model="meta-llama/Llama-3.2-3B-Instruct",
+        model="meta-llama/Llama-3.2-3B-Instruct",
         token=api_key
     )
 
