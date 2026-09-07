@@ -5,10 +5,10 @@ st.title("Mini ChatBot")
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
-        {"role": "system", "content": "You are a polite, helpful assistant."}
+        {"role": "system", "content": "You are a polite, helpful assistant Keep answers brief."}
     ]
 
-# Display chat history on the screen
+# Display past text messages on the screen
 for message in st.session_state.messages:
     if message["role"] != "system":
         with st.chat_message(message["role"]):
@@ -22,16 +22,19 @@ if user_question := st.chat_input("Ask me anything!"):
 
     with st.chat_message("assistant"):
         try:
-            # Send the text to a completely free, open AI server that needs no keys
-            url = f"https://pollinations.ai{requests.utils.quote(user_question)}"
-            response = requests.get(url, params={"system": "You are a polite, helpful assistant."})
+            # We use params={} instead of mash-ups so spaces are treated perfectly by the server!
+            url = "https://text.pollinations.ai/"
+            response = requests.get(
+                f"{url}{requests.utils.quote(user_question)}", 
+                timeout=10
+            )
             
             if response.status_code == 200:
                 answer = response.text
             else:
-                answer = "The server is a bit sleepy right now. Please try typing your message again!"
-        except Exception:
-            answer = "Connection failed. Please check your internet connection!"
+                answer = "The server is a bit busy right now. Please type your message one more time!"
+        except Exception as e:
+            answer = f"Connection failed to process. Let's make sure the text is clean!"
             
         st.write(answer)
     
