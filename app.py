@@ -8,7 +8,7 @@ st.title("Mini AI Chat Bot")
 api_key = "hf_YOUR_ACTUAL_KEY_HERE"
 # --------------------------
 
-if api_key and api_key != "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":
+if api_key and api_key != "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":
     # Set up a direct connection to a super smart free model
     client = InferenceClient(
         model="Qwen/Qwen2.5-72B-Instruct",
@@ -45,4 +45,4 @@ if api_key and api_key != "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":
         
         st.session_state.messages.append({"role": "assistant", "content": answer})
 else:
-    st.warning("⚠️ Configuration Error: Please open app.py in Notepad and replace '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' with your real Hugging Face key!")
+    st.warning("⚠️ Configuration Error: Please open app.py in Notepad and replace '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' with your real Hugging Face key!")
