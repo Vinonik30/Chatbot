@@ -1,2 +1,5 @@
 streamlit
 huggingface_hub
+requests
+mcp
+duckduckgo-mcp-server
