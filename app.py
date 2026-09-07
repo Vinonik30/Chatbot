@@ -1,23 +1,7 @@
 import streamlit as st
-import subprocess
-import os
+import requests
 
 st.title("Mini ChatBot")
-
-# --- INITIALIZE A COMPLETELY FREE LOCAL BRAIN ---
-@st.cache_resource
-def launch_local_brain():
-    # If the local AI system isn't running yet, turn it on in the background!
-    try:
-        # Download and run a super fast, completely free AI brain
-        subprocess.Popen(["curl", "-fsSL", "https://ollama.com", "|", "sh"], shell=True)
-        subprocess.Popen(["ollama", "run", "tinyllama"])
-        return True
-    except Exception:
-        return False
-
-brain_ready = launch_local_brain()
-# ------------------------------------------------
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -38,16 +22,23 @@ if user_question := st.chat_input("Ask me anything!"):
 
     with st.chat_message("assistant"):
         try:
-            import ollama
-            # Directly talk to your app's personal built-in brain!
-            response = ollama.chat(
-                model='tinyllama',
-                messages=st.session_state.messages
+            # Connect directly through a stable public mirror using clean parameter tags
+            url = "https://pollinations.ai"
+            response = requests.get(
+                url, 
+                params={"prompt": user_question, "model": "openai"},
+                timeout=15
             )
-            answer = response['message']['content']
-        except Exception as e:
-            # If the background engine is still booting up on the first try, show a helpful hint
-            answer = "I am waking up my built-in engine right now! Please type your message one more time in 10 seconds."
+            
+            if response.status_code == 200:
+                answer = response.text
+                # Clean up any rare raw code leaks automatically
+                if "<!DOCTYPE" in answer:
+                    answer = "I connected to the brain, but it's sending back messy server layout. Try asking me a different question like 'Tell me a joke'!"
+            else:
+                answer = "The server is a bit busy. Please try typing your message one more time!"
+        except Exception:
+            answer = "Connection failed to process. Let's try sending the message again!"
             
         st.write(answer)
     
