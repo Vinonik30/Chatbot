@@ -1,7 +1,23 @@
 import streamlit as st
-import requests
+import subprocess
+import os
 
 st.title("Mini ChatBot")
+
+# --- INITIALIZE A COMPLETELY FREE LOCAL BRAIN ---
+@st.cache_resource
+def launch_local_brain():
+    # If the local AI system isn't running yet, turn it on in the background!
+    try:
+        # Download and run a super fast, completely free AI brain
+        subprocess.Popen(["curl", "-fsSL", "https://ollama.com", "|", "sh"], shell=True)
+        subprocess.Popen(["ollama", "run", "tinyllama"])
+        return True
+    except Exception:
+        return False
+
+brain_ready = launch_local_brain()
+# ------------------------------------------------
 
 if "messages" not in st.session_state:
     st.session_state.messages = [
@@ -15,39 +31,23 @@ for message in st.session_state.messages:
             st.write(message["content"])
 
 # Wait for Dad to type a question
-if user_question := st.chat_input("Ask me anything !"):
+if user_question := st.chat_input("Ask me anything!"):
     with st.chat_message("user"):
         st.write(user_question)
     st.session_state.messages.append({"role": "user", "content": user_question})
 
     with st.chat_message("assistant"):
         try:
-            # We connect directly to DuckDuckGo's open chat API layout
-            url = "https://duckduckgo.com"
-            payload = {'q': user_question}
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
-            
-            # Simple alternative free endpoint fallback
-            alt_url = f"https://pollinations.ai{requests.utils.quote(user_question)}?json=true"
-            response = requests.get(alt_url, timeout=10)
-            
-            if response.status_code == 200:
-                # If pollinations sent json format, parse it safely
-                try:
-                    data = response.json()
-                    answer = data.get("response", data.get("text", response.text))
-                except:
-                    # Clean out HTML manually if it leaked through
-                    if "<!DOCTYPE" in response.text:
-                        answer = "Hey there! I am connected to the server, but it sent back a messy layout. Try asking me a different question like 'Tell me a joke'!"
-                    else:
-                        answer = response.text
-            else:
-                answer = "The server is taking a short nap. Try typing your message one more time!"
+            import ollama
+            # Directly talk to your app's personal built-in brain!
+            response = ollama.chat(
+                model='tinyllama',
+                messages=st.session_state.messages
+            )
+            answer = response['message']['content']
         except Exception as e:
-            answer = "Connection failed to process. Let's make sure the text is clean!"
+            # If the background engine is still booting up on the first try, show a helpful hint
+            answer = "I am waking up my built-in engine right now! Please type your message one more time in 10 seconds."
             
         st.write(answer)
     
