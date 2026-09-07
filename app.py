@@ -1,21 +1,23 @@
 import streamlit as st
+import requests
 from huggingface_hub import InferenceClient
 
-st.title("Mini ChatBot")
+st.title("mini ChatBot")
 
-# --- FETCH HIDDEN KEY FROM STREAMLIT VAULT ---
-try:
-    api_key = st.secrets["HF_TOKEN"]
-except Exception:
-    api_key = None
-# ---------------------------------------------
+# --- AUTO-LOAD THE KEY SAFELY ---
+@st.cache_resource
+def get_client():
+    try:
+        # Pulls your token securely from Streamlit's secrets box
+        token = st.secrets["HF_TOKEN"]
+        return InferenceClient(model="microsoft/Phi-3-mini-4k-instruct", token=token)
+    except Exception:
+        return None
 
-if api_key:
-    client = InferenceClient(
-        model="microsoft/Phi-3-mini-4k-instruct",
-        token=api_key
-    )
+client = get_client()
+# ---------------------------------
 
+if client:
     if "messages" not in st.session_state:
         st.session_state.messages = [
             {"role": "system", "content": "You are a polite, helpful assistant Keep answers brief."}
@@ -37,12 +39,13 @@ if api_key:
                     messages=st.session_state.messages,
                     max_tokens=500
                 )
-                answer = response.choices.message.content
+                answer = response.choices[0].message.content
             except Exception as e:
-                answer = "Error connecting: Could not reach the model brain. Make sure your key is saved in Streamlit Secrets!"
+                answer = "Error connecting: Could not reach the model brain. Let's fix your secret key format!"
                 
             st.write(answer)
         
         st.session_state.messages.append({"role": "assistant", "content": answer})
 else:
-    st.warning("⚠️ Configuration Error: Please add your 'HF_TOKEN' to your Streamlit App Secrets Vault!")
+    st.warning("⚠️ Setup needed: Let's fix your token name format!")
+    st.code('HF_TOKEN = "hf_your_actual_key_here"', language="toml")
