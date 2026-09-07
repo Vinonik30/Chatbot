@@ -10,7 +10,7 @@ except Exception:
     api_key = None
 
 if api_key:
-    # We connect directly to a completely open model that needs no license approval
+    # Connect directly to a completely open, fast server model
     client = InferenceClient(
         model="Qwen/Qwen2.5-1.5B-Instruct",
         token=api_key
@@ -26,18 +26,19 @@ if api_key:
             with st.chat_message(message["role"]):
                 st.write(message["content"])
 
-    if user_question := st.chat_input("Ask me anything! Required key is active."):
+    if user_question := st.chat_input("Ask me anything!"):
         with st.chat_message("user"):
             st.write(user_question)
         st.session_state.messages.append({"role": "user", "content": user_question})
 
         with st.chat_message("assistant"):
             try:
-                response = client.chat_completion(
-                    messages=st.session_state.messages,
-                    max_tokens=500
+                # Optimized standard format for Hugging Face open endpoints
+                answer = client.text_generation(
+                    prompt=user_question,
+                    max_new_tokens=200,
+                    system_instruction="You are a polite, helpful assistant Keep answers brief."
                 )
-                answer = response.choices.message.content
             except Exception as e:
                 answer = "Error connecting: Please make sure your token in Streamlit secrets is a fresh Legacy Read key!"
                 
