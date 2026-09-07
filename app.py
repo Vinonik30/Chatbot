@@ -22,19 +22,20 @@ if user_question := st.chat_input("Ask me anything!"):
 
     with st.chat_message("assistant"):
         try:
-            # We use params={} instead of mash-ups so spaces are treated perfectly by the server!
-            url = "https://text.pollinations.ai/"
+            # Clean structure: pass the question as a safe query parameter data object
+            url = "https://pollinations.ai"
             response = requests.get(
-                f"{url}{requests.utils.quote(user_question)}", 
-                timeout=10
+                url, 
+                params={"prompt": user_question},
+                timeout=15
             )
             
             if response.status_code == 200:
                 answer = response.text
             else:
-                answer = "The server is a bit busy right now. Please type your message one more time!"
+                answer = f"The server returned an issue code: {response.status_code}. Try refreshing!"
         except Exception as e:
-            answer = f"Connection failed to process. Let's make sure the text is clean!"
+            answer = "Connection failed to process. Let's make sure the text is clean!"
             
         st.write(answer)
     
